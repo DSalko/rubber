@@ -626,8 +626,17 @@ namespace :rubber do
           expanded_pkg_list << pkg_spec
         end
       end
+
+      @os_specific_opts = get_host_options('os_packages') { |pkg_list| pkg_list.join(' ') }
+
       expanded_pkg_list << 'ec2-ami-tools' if rubber_env.cloud_provider == 'aws'
       expanded_pkg_list.join(' ')
+    end
+
+    opts.each do |host, packages|
+      if @os_specific_opts.has_key?(host)
+        opts[host] << " #{@os_specific_opts[host]}"
+      end
     end
 
     rsudo "apt-get -q update"
